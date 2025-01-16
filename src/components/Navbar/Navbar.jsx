@@ -2,7 +2,7 @@
 
 import Home from "@/app/page"
 import Ancor from "@/components/AncorBox/AncorBox"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 export default function Navbar() {
 
@@ -28,7 +28,7 @@ export default function Navbar() {
     }
 
     return(
-        <header className="flex flex-col h-screen w-20 items-center justify-center header bg-neutral-100">
+        <header className="flex flex-col h-screen w-20 items-center justify-center header bg-neutral-100 dark:bg-neutral-800">
             <nav className="flex flex-col justify-evenly h-2/6">
                 <Ancor icon={"fa-solid fa-house"} selected={navbar.Home} onClick={reloadNavbar} aid={"Home"} />
                 <Ancor icon={"fa-solid fa-music"} selected={navbar.Player} onClick={reloadNavbar} aid={"Player"} />
