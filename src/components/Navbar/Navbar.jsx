@@ -1,27 +1,41 @@
 'use client'
 
-import Home from "@/app/page"
 import Ancor from "@/components/AncorBox/AncorBox"
-import { useState } from "react"
+import { redirect } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function Navbar() {
 
-    const [navbar, setNavbar] = useState({
-        Home : true,
-        Player : false,
-        Account : false
-    })
+    let navbarInitialData = {}
+
+    if (sessionStorage.getItem('navbarStatus') == null) {
+        navbarInitialData = {
+            Home: true,
+            Player: false,
+            Account: false
+        }
+        
+    }else {
+        navbarInitialData = JSON.parse(sessionStorage.getItem('navbarStatus'))
+    }
+
+    const [navbar, setNavbar] = useState(navbarInitialData)
 
     function reloadNavbar(event) {
         switch(event.target.id) {
             case "Home":
                 setNavbar({Home : true, Player:false, Account: false})
+                sessionStorage.setItem('navbarStatus', JSON.stringify({Home : true, Player:false, Account: false}))
+                redirect('/')
                 break;
             case "Player":
                 setNavbar({Home : false, Player:true, Account: false})
+                sessionStorage.setItem('navbarStatus', JSON.stringify({Home : false, Player:true, Account: false}))
                 break;
             case "Account":
                 setNavbar({Home : false, Player:false, Account: true})
+                sessionStorage.setItem('navbarStatus', JSON.stringify({Home : false, Player:false, Account: true}))
+                redirect('/login')
                 break;
         }
         console.log(event.target.id)
