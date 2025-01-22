@@ -1,3 +1,22 @@
+const mysql = require('mysql')
+const fs = require('fs')
+
+var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database: 'fusyc'
+});
+  
+connection.connect(); 
+
+connection.query('SELECT Usernames, Passwords FROM users', function(err, result, fields) {
+    if (err) throw err;
+    console.log(result)
+});
+  
+connection.end();
+
 const express = require('express')
 const app = express()
 
