@@ -1,5 +1,6 @@
+const express = require('express')
 const mysql = require('mysql')
-const fs = require('fs')
+const bodyParser = require('body-parser')
 
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -7,21 +8,26 @@ var connection = mysql.createConnection({
     password : '',
     database: 'fusyc'
 });
-  
-connection.connect(); 
 
-connection.query('SELECT Usernames, Passwords FROM users', function(err, result, fields) {
-    if (err) throw err;
-    console.log(result)
-});
-  
-connection.end();
 
-const express = require('express')
 const app = express()
+app.use(bodyParser.urlencoded({extended:true}))
 
 app.get('/api/login', (req, res) => {
     console.log("Login request received!")
+})
+
+app.post('/api/register', (req, res) => {
+    
+    connection.connect()
+
+    connection.query("INSERT INTO users (Username, Password) VALUES ('" + req.body.username + "', '" + req.body.password + "');", function (err, result, fields) {
+        if (err) throw err;
+        console.log(result)
+    });
+
+    connection.end()
+
 })
 
 app.get('/', (req, res) => { 
