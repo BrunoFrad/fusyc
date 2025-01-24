@@ -4,11 +4,11 @@ import SignUpForm from "../../components/SingupForm/SignUpForm"
 
 export default function Login() {
 
-  if(localStorage.getItem("login") === null) {
-    localStorage.setItem("login", false)
+  if(localStorage.getItem("goLogin") === null) {
+    localStorage.setItem("goLogin", false)
   }else {
 
-    if(localStorage.getItem("login") === "false") {
+    if(localStorage.getItem("goLogin") === "false") {
       return(
         <article className="flex">
             <Navbar />

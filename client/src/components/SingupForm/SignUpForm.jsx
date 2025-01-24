@@ -1,5 +1,9 @@
 export default function SignUpForm() {
 
+    function handleSubmit() {
+        localStorage.setItem("goLogin", "true");
+    }
+
     return(
         <form className="flex items-center font-bold text-neutral-300 bg-neutral-800 w-5/6 h-5/6 rounded-3xl shadow-xl" action="http://localhost:3000/api/register" method="POST">
             <div className="flex flex-col items-center justify-evenly h-5/6 w-full">
@@ -24,7 +28,7 @@ export default function SignUpForm() {
                     </svg>
                     <input type="password" className="grow" placeholder="Senha" name="password" />
                 </label>
-                <button className="btn btn-primary w-40 text-neutral-300" type="submit">Submit</button>
+                <button className="btn btn-primary w-40 text-neutral-300" type="submit" onClick={handleSubmit}>Submit</button>
             </div>
         </form>
     )

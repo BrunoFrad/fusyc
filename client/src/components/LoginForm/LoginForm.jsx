@@ -1,5 +1,15 @@
 export default function LoginForm() {
     
+    async function handleSubmit() {
+        await fetch('http://localhost:3000/api/loginSuccessful').then((res) => {
+            console.log(res.status)
+            if(res.status === 200) {
+                localStorage.setItem("login", "true")
+                window.location.replace('http://localhost:5173/index.html');
+            }
+        })
+    }
+
     return(
 
         <form className="flex items-center font-bold text-neutral-300 bg-neutral-800 w-5/6 h-5/6 rounded-3xl shadow-xl" action="http://localhost:3000/api/login" method="POST">
@@ -25,7 +35,7 @@ export default function LoginForm() {
                     </svg>
                     <input type="password" className="grow" placeholder="Senha" name="password" />
                 </label>
-                <button className="btn btn-primary w-40 text-neutral-300" type="submit" >Submit</button>
+                <button className="btn btn-primary w-40 text-neutral-300" type="submit" onClick={handleSubmit} >Submit</button>
             </div>
         </form>
     )
