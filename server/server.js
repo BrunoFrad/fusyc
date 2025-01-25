@@ -16,8 +16,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({
-    origin: 'http://localhost:5173',
-    methods: 'GET,POST'
+    origin: 'http://localhost:5173'
 }))
 
 app.post('/api/login', (req, res) => {
@@ -30,24 +29,18 @@ app.post('/api/login', (req, res) => {
             console.error("Database error:", err);
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
-        
+
         if (result.length > 0) {
             console.log("Login Concluído!");
-            loginSucessful = "true"
+            loginSuccessful = "true"
+            res.json({success: loginSuccessful})
         } else {
+            loginSuccessful = "false"
             console.log("Login Falho");
-            res.redirect('http://localhost:5173/login.html');
+            res.json({success: loginSuccessful})
         }
     });
 });
-
-app.get('/api/loginSuccessful', (req, res) => {
-    console.log(loginSuccessful)
-    if(loginSuccessful === "true")
-        res.end("200")
-    else
-        res.end("500")
-})
 
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
