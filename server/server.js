@@ -11,6 +11,7 @@ const connection = mysql.createPool({
 });
 
 let loginSuccessful = "false"
+let query
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -44,17 +45,31 @@ app.post('/api/login', (req, res) => {
 
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
-    
-    const query = "INSERT INTO users (Username, Password) VALUES (?, ?)";
-    connection.query(query, [username, password], (err, result) => {
+
+    query = "SELECT * FROM users WHERE Username = ?";
+    connection.query(query, [username], (err, result) => {
         if (err) {
             console.error("Database error:", err);
-            console.log("ERROR : ", err);
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
+
+        else if(result.length == 0) {
+            query = "INSERT INTO users (Username, Password) VALUES (?, ?)";
+            connection.query(query, [username, password], (err, result) => {
+                if (err) {
+                    console.error("Database error:", err);
+                    console.log("ERROR : ", err);
+                    return res.status(500).json({ success: false, message: "Internal server error" });
+                }
         console.log("User registered successfully", result);
         res.redirect('http://localhost:5173/login.html');
-    });
+        });}
+        else {
+            success = false;
+        }
+    })
+    
+    
 });
 
 app.get('/', (req, res) => { 
