@@ -1,11 +1,24 @@
 export default function SignUpForm() {
 
-    function handleSubmit() {
-        localStorage.setItem("goLogin", "true");
+    async function handleSubmit() {
+        const response = await fetch('http://localhost:3000/api/register', {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username: usernameRef.current.value, password: passwordRef.current.value}),
+            method: 'POST',
+        }).then(response => response.json()).then(data => {
+            
+            if(data.success === true) {
+                localStorage.setItem("goLogin", "true");
+            } else {
+                localStorage.setItem("goLogin", "false");
+            }
+        })
     }
 
     return(
-        <form className="flex items-center font-bold text-neutral-300 bg-neutral-800 w-5/6 h-5/6 rounded-3xl shadow-xl" action="http://localhost:3000/api/register" method="POST">
+        <div className="flex items-center font-bold text-neutral-300 bg-neutral-800 w-5/6 h-5/6 rounded-3xl shadow-xl">
             <div className="flex flex-col items-center justify-evenly h-5/6 w-full">
                 <h1 className="text-6xl">Registrar</h1>
                 <label className="input input-bordered flex items-center gap-2 bg-neutral-800">
@@ -30,6 +43,6 @@ export default function SignUpForm() {
                 </label>
                 <button className="btn btn-primary w-40 text-neutral-300" type="submit" onClick={handleSubmit}>Submit</button>
             </div>
-        </form>
+        </div>
     )
 }
