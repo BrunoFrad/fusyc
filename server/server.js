@@ -95,16 +95,66 @@ app.post('/api/newplaylist', (req, res) => {
             res.json({success : false});
         }else if (result == 0) {
             query = "CREATE TABLE " + name + " (NAME varchar(255), SONGS varchar(255));";
-            connection.query(query, (err, result) => {console.log("table created")});
-            for(song in songsArr) {
-                console.log("song")
-                connection.query("INSERT INTO " + name + " (NAME) " + "VALUES(" + songsArr[song] + ");");
-            }
+            connection.query(query, (err, result) => {
+                console.log("table created")
+                for(song in songsArr) {
+                    console.log(songsArr[song])
+                    connection.query("INSERT INTO " + name + " (NAME) " + "VALUES(" + songsArr[song] + ");");
+                }
+            });
             res.json({success : true});
         }
     })
 
 })
+
+app.get('/api/playlists', (req, res) => {
+    const query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='fusyc'";
+    
+    connection.query(query, (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: "Internal server error" });
+        }
+        
+        let responseContent = [];
+        let pendingQueries = result.length;
+        
+        if (pendingQueries === 0) {
+            return res.json({ result: responseContent });
+        }
+        
+        result.forEach((table) => {
+            if (table.TABLE_NAME !== 'users') {
+                const songQuery = `SELECT NAME FROM ${table.TABLE_NAME}`;
+                
+                connection.query(songQuery, (err, resul) => {
+                    if (err) {
+                        console.error("Database error:", err);
+                    }
+                    
+                    let songList = resul ? resul.map(row => row.NAME) : [];
+                    
+                    responseContent.push({
+                        name: table.TABLE_NAME,
+                        songs: songList,
+                    });
+                    
+                    pendingQueries--;
+                    if (pendingQueries === 0) {
+                        res.json({ result: responseContent });
+                    }
+                });
+            } else {
+                pendingQueries--;
+                if (pendingQueries === 0) {
+                    res.json({ result: responseContent });
+                }
+            }
+        });
+    });
+});
+
 
 app.get('/', (req, res) => { 
     console.log("Connected to the server!");

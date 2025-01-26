@@ -1,11 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const EditPlaylist = () => {
-  const [playlists, setPlaylists] = useState([
-    { name: 'Playlist 1', songs: ['Song 1', 'Song 2'] },
-    { name: 'Playlist 2', songs: ['Song 3', 'Song 4'] }
-  ]);
+  const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [newSong, setNewSong] = useState('');
 
@@ -21,6 +18,23 @@ const EditPlaylist = () => {
       setNewSong('');
     }
   };
+
+  async function getPlaylistNames() {
+    try {
+      const response = await fetch('http://localhost:3000/api/playlists');
+      const data = await response.json();
+      setPlaylists(data.result);
+      console.log(data.result)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  } 
+
+  useEffect(() => {
+
+    getPlaylistNames()
+
+  }, []);
 
   return (
     <dialog id="my_modal_2" className="modal">
