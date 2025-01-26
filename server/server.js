@@ -79,6 +79,33 @@ app.post('/api/register', (req, res) => {
     
 });
 
+app.post('/api/newplaylist', (req, res) => {
+
+    const {name, songsArr} = req.body
+
+    query = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?;"
+    connection.query(query, [name] , (err, result) => {
+
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: "Internal server error" });
+        }
+
+        if(result > 0) {
+            return res.json({success : false});
+        }else if (result == 0) {
+            query = "CREATE TABLE " + name + " (NAME varchar(255), SONGS varchar(255));";
+            connection.query(query, (err, result) => {console.log("table created")});
+            for(song in songsArr) {
+                console.log("song")
+                connection.query("INSERT INTO " + name + " (NAME) " + "VALUES(" + songsArr[song] + ");");
+            }
+        }
+
+    })
+
+})
+
 app.get('/', (req, res) => { 
     console.log("Connected to the server!");
     res.send("Server is running");

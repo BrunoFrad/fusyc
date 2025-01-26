@@ -13,13 +13,21 @@ const CreatePlaylist = () => {
     }
   };
 
-  const handleCreatePlaylist = () => {
+  async function handleCreatePlaylist() {
+
+    const response = await fetch('http://localhost:3000/api/newplaylist', {
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({name : playlistName ,songsArr: songs}),
+      method: 'POST',
+  })
 
     document.getElementById('nome-musica').value = ''
     setSongs([])
     setPlaylistName('')
 
-  };
+  }
 
   return (
     <dialog id="my_modal_1" className="modal">
