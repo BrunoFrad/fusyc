@@ -91,8 +91,8 @@ app.post('/api/newplaylist', (req, res) => {
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
 
-        if(result > 0) {
-            return res.json({success : false});
+        if(result.length > 0) {
+            res.json({success : false});
         }else if (result == 0) {
             query = "CREATE TABLE " + name + " (NAME varchar(255), SONGS varchar(255));";
             connection.query(query, (err, result) => {console.log("table created")});
@@ -100,8 +100,8 @@ app.post('/api/newplaylist', (req, res) => {
                 console.log("song")
                 connection.query("INSERT INTO " + name + " (NAME) " + "VALUES(" + songsArr[song] + ");");
             }
+            res.json({success : true});
         }
-
     })
 
 })

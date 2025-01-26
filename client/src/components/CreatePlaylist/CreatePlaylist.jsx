@@ -21,11 +21,11 @@ const CreatePlaylist = () => {
       },
       body: JSON.stringify({name : playlistName ,songsArr: songs}),
       method: 'POST',
-  })
-
-    document.getElementById('nome-musica').value = ''
-    setSongs([])
-    setPlaylistName('')
+    }).then((data) => {
+        document.getElementById('nome-musica').value = ''
+        setSongs([])
+        setPlaylistName('')
+    })
 
   }
 

@@ -21,7 +21,8 @@ export default function App() {
             <div className="flex flex-row justify-evenly w-3/6">
               <FeatureBox title={"Criar nova playlist! 🎉"} onClick={() => document.getElementById('my_modal_1').showModal()} />
               <CreatePlaylist />
-              <FeatureBox title={"Editar uma playlist! 📝"} />
+              <FeatureBox title={"Editar uma playlist! 📝"} onClick={() => document.getElementById('my_modal_2').showModal()} />
+              <EditPlaylist />
             </div>
           </div>
         </div>
