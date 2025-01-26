@@ -45,6 +45,7 @@ app.post('/api/login', (req, res) => {
 
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
+    let successController = false;
 
     query = "SELECT * FROM users WHERE Username = ?";
     connection.query(query, [username], (err, result) => {
@@ -62,11 +63,17 @@ app.post('/api/register', (req, res) => {
                     return res.status(500).json({ success: false, message: "Internal server error" });
                 }
         console.log("User registered successfully", result);
-        res.redirect('http://localhost:5173/login.html');
+        successController = true;
+        return res.json({success : successController});
         });}
         else {
-            success = false;
+            successController = false;
+            return res.json({success : successController});
         }
+
+        console.log(successController)
+        
+
     })
     
     
