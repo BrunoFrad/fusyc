@@ -6,7 +6,7 @@ const cors = require('cors')
 const connection = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'test',
+    password: '',
     database: 'fusyc'
 });
 
@@ -104,6 +104,21 @@ app.post('/api/newplaylist', (req, res) => {
             });
             res.json({success : true});
         }
+    })
+
+    app.post('/api/editplaylist', (req, res) => {
+        const {songlist, name} = req.body;
+        query = "SELECT * FROM ? WHERE NAME = ?";
+        songlist.forEach(song => {
+            connection.query(query, [name, song], (err, result) => {
+                if(result.length = 0) {
+                    query = 'INSERT INTO ? (NAME) VALUES (?)'
+                    connection.query(query, [name, song])
+                }
+            })
+            
+        
+        });
     })
 
 })
