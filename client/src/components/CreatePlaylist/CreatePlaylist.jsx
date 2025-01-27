@@ -2,12 +2,22 @@ import React, { useState } from 'react';
 const CreatePlaylist = () => {
   const [playlistName, setPlaylistName] = useState('');
   const [songs, setSongs] = useState([]);
+  const [musicGenre, setGenre] = useState([]);
   const [newSong, setNewSong] = useState('');
+  const [newGenre, setNewGenre] = useState('');
+  const [newLink, setNewLink] = useState('');
+
   const handleAddSong = () => {
     if (newSong.trim() !== '') {
       setSongs([...songs, newSong]);
       setNewSong('');
     }
+
+    if (newSong.trim() !== '') {
+      setGenre([...musicGenre, newGenre]);
+      setNewGenre('');
+    }
+
   };
 
   const handleFileChange = (e) => {
@@ -19,13 +29,14 @@ const CreatePlaylist = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: playlistName, songsArr: songs }),
+      body: JSON.stringify({ name: playlistName, songsArr: songs, genre: musicGenre}),
       method: 'POST',
     })
 
-    document.getElementById('nome-musica').value = ''
-    setSongs([])
-    setPlaylistName('')
+    document.getElementById('nome-musica').value = '';
+    setSongs([]);
+    setPlaylistName('');
+    setGenre([]);
 
   }
 
@@ -59,11 +70,20 @@ const CreatePlaylist = () => {
                 id='nome-musica'
               />
               <input
-                type="file"
-                accept="audio/*"
-                onChange={handleFileChange}
+                type="text"
+                placeholder="Digite a categoria da música"
+                value={newGenre}
+                onChange={(e) => setNewGenre(e.target.value)}
                 className="border p-3 rounded w-full text-neutral-200"
-                required
+                id='genero-musica'
+              />
+              <input
+                type="text"
+                placeholder="Digite o link do spotify da sua musica"
+                value={newLink}
+                onChange={(e) => setNewLink(e.target.value)}
+                className="border p-3 rounded w-full text-neutral-200 mb-3"
+                id='link-musica'
               />
               <button
                 onClick={handleAddSong}

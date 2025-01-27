@@ -80,63 +80,75 @@ app.post('/api/register', (req, res) => {
 });
 
 app.post('/api/editplaylist', (req, res) => {
-    const { songlist, name } = req.body;
+    const { songlist, name, genre } = req.body;
+    let query = "SELECT * FROM ?? WHERE NAME = ?";
+    for(index in songlist) {
+        connection.query(query, [name, songlist[index]], (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                return res.status(500).send('Database query error');
+            }
 
-    if (!songlist || !Array.isArray(songlist) || songlist.length === 0 || !name) {
+            if (result && result.length === 0) {
+                query = 'INSERT INTO ?? (NAME, GENRE) VALUES (?, ?)';
+                connection.query(query, [name, songlist[index], genre[index]], (err) => {
+                    if (err) {
+                        console.error('Error inserting song:', err);
+                        return res.status(500).send('Error inserting song');
+                    }
+                    console.log(`Song ${songlist[index]} inserted`);
+                });
+            } else {
+                console.log(`Song ${songlist[index]} already exists`);
+            }
+
+            console.log(genre);
+        });
+    }
+});
+
+app.post('/api/newplaylist', (req, res) => {
+    const { name, songsArr, genre } = req.body;
+
+    if (!name || !Array.isArray(songsArr) || !Array.isArray(genre) || songsArr.length !== genre.length) {
         return res.status(400).json({ success: false, message: "Invalid input data" });
     }
 
-    songlist.forEach(song => {
-        let selectQuery = `SELECT * FROM ${mysql.escapeId(name)} WHERE NAME = ?`;
-        connection.query(selectQuery, [song], (err, result) => {
-            if (err) {
-                console.error("Database error:", err);
-                return res.status(500).json({ success: false, message: "Internal server error" });
-            }
-
-            if (result.length === 0) {
-                let insertQuery = `INSERT INTO ${mysql.escapeId(name)} (NAME) VALUES (?)`;
-                connection.query(insertQuery, [song], (err) => {
-                    if (err) {
-                        console.error("Database error:", err);
-                    }
-                });
-            }
-        });
-    });
-
-    res.json({ success: true });
-});
-
-
-app.post('/api/newplaylist', (req, res) => {
-
-    const {name, songsArr} = req.body
-
-    query = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?;"
-    connection.query(query, [name] , (err, result) => {
-
+    const queryCheck = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?;";
+    connection.query(queryCheck, [name], (err, result) => {
         if (err) {
             console.error("Database error:", err);
             return res.status(500).json({ success: false, message: "Internal server error" });
         }
 
-        if(result.length > 0) {
-            res.json({success : false});
-        }else if (result == 0) {
-            query = "CREATE TABLE " + name + " (NAME varchar(255), SONGS varchar(255));";
-            connection.query(query, (err, result) => {
-                console.log("table created")
-                for(song in songsArr) {
-                    console.log(songsArr[song])
-                    connection.query("INSERT INTO " + name + " (NAME) " + "VALUES(" + songsArr[song] + ");");
+        if (result.length > 0) {
+            return res.json({ success: false });
+        } else {
+            const createTableQuery = `CREATE TABLE ?? (NAME varchar(255), LINK varchar(255) , GENRE varchar(255))`;
+            connection.query(createTableQuery, [name], (err) => {
+                if (err) {
+                    console.error("Database error:", err);
+                    return res.status(500).json({ success: false, message: "Internal server error" });
                 }
-            });
-            res.json({success : true});
-        }
-    })
 
-})
+                console.log("Table created");
+
+                const insertQuery = "INSERT INTO ?? (NAME, GENRE) VALUES ?";
+                const values = songsArr.map((song, index) => [song, genre[index]]);
+
+                connection.query(insertQuery, [name, values], (err) => {
+                    if (err) {
+                        console.error("Database error:", err);
+                        return res.status(500).json({ success: false, message: "Internal server error" });
+                    }
+
+                    console.log("Songs inserted successfully");
+                    res.json({ success: true });
+                });
+            });
+        }
+    });
+});
 
 app.get('/api/playlists', (req, res) => {
     const query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='fusyc'";
@@ -165,15 +177,29 @@ app.get('/api/playlists', (req, res) => {
                     
                     let songList = resul ? resul.map(row => row.NAME) : [];
                     
-                    responseContent.push({
-                        name: table.TABLE_NAME,
-                        songs: songList,
-                    });
-                    
-                    pendingQueries--;
-                    if (pendingQueries === 0) {
-                        res.json({ result: responseContent });
-                    }
+                    connection.query(`SELECT GENRE FROM ${table.TABLE_NAME}`, (err, result) => {
+
+                        if (err) {
+                            console.error("Database error:", err);
+                        }
+
+                        let genreList = result ? result.map(row => row.GENRE) : [];
+                        console.log("Ok + ", genreList)
+
+                        responseContent.push({
+                            name: table.TABLE_NAME,
+                            songs: songList,
+                            genre : genreList,
+                        });
+
+                        console.log(responseContent)
+
+                        pendingQueries--;
+                        if (pendingQueries === 0) {
+                            res.json({ result: responseContent });
+                        }
+
+                    })
                 });
             } else {
                 pendingQueries--;
@@ -184,7 +210,6 @@ app.get('/api/playlists', (req, res) => {
         });
     });
 });
-
 
 app.get('/', (req, res) => { 
     console.log("Connected to the server!");

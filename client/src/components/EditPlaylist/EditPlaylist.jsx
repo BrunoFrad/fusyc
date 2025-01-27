@@ -5,18 +5,30 @@ const EditPlaylist = () => {
   const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [newSong, setNewSong] = useState('');
+  const [musicGenre, setGenre] = useState([]);
+  const [newGenre, setNewGenre] = useState('');
+  const [newLink, setNewLink] = useState('');
 
   const handleAddSong = () => {
-    if (newSong.trim() !== '' && selectedPlaylist !== null) {
+    if (newSong.trim() !== '' && selectedPlaylist !== null && newGenre.trim() !== '') {
       const updatedPlaylists = playlists.map((playlist, index) => {
         if (index === selectedPlaylist) {
-          return { ...playlist, songs: [...playlist.songs, newSong] };
+          return { 
+            ...playlist, 
+            songs: [...playlist.songs, newSong], 
+            genre: [...playlist.genre, newGenre] 
+          };
         }
         return playlist;
       });
       setPlaylists(updatedPlaylists);
       setNewSong('');
+      setNewGenre('');
     }
+  };  
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
   };
 
   async function getPlaylistNames() {
@@ -30,23 +42,32 @@ const EditPlaylist = () => {
     }
   }
 
-  async function handleSubmit() {
-
-    window.alert("ok")
-
+  const handleSubmit = async () => {
     try {
-      const response = fetch('http://localhost:3000/api/editplaylist', {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method : "POST",
-        body: JSON.stringify({name : playlists[selectedPlaylist].name, songlist : playlists[selectedPlaylist].songs}),
+      const response = await fetch('http://localhost:3000/api/editplaylist', {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({
+          name: playlists[selectedPlaylist].name,
+          songlist: playlists[selectedPlaylist].songs,
+          genre: playlists[selectedPlaylist].genre,
+        }),
       });
+  
+      const data = await response.json();
+      console.log(data);
+  
+      if (data.success) {
+        setNewSong('');
+        setNewGenre('');
+        setGenre([]);
+      }
+  
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error:', error);
     }
-
-  }
+  };
+  
 
   useEffect(() => {
 
@@ -55,7 +76,7 @@ const EditPlaylist = () => {
   }, []);
 
   return (
-    <dialog id="my_modal_2" className="modal">
+    <dialog id="my_modal_2" className="modal overflow-auto">
       <div className="flex flex-col items-center justify-center p-4 modal-box bg-transparent">
         <div className="bg-neutral-800 shadow-lg rounded-2xl p-6 w-full max-w-md border">
           <h1 className="text-3xl font-bold text-center mb-6 text-neutral-200">
@@ -78,12 +99,12 @@ const EditPlaylist = () => {
               <h2 className="text-xl font-bold text-neutral-200 mb-2">Músicas:</h2>
               <ul className="list-disc pl-6 space-y-1 text-neutral-200 mb-4">
                 {playlists[selectedPlaylist].songs.map((song, index) => (
-                  <li key={index}>{song}</li>
+                  <li key={index}>{song} | {playlists[selectedPlaylist].genre[index]}</li>
                 ))}
               </ul>
               <div className="mb-4">
                 <label className="block text-lg font-medium mb-2 text-neutral-200">Adicionar Música</label>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
                   <input
                     type="text"
                     placeholder="Digite o nome da música"
@@ -91,6 +112,22 @@ const EditPlaylist = () => {
                     onChange={(e) => setNewSong(e.target.value)}
                     className="border p-3 rounded w-full text-neutral-200"
                     id='nome-musica'
+                  />
+                  <input
+                    type="text"
+                    placeholder="Digite a categoria da música"
+                    value={newGenre}
+                    onChange={(e) => setNewGenre(e.target.value)}
+                    className="border p-3 rounded w-full text-neutral-200 mb-3"
+                    id='genero-musica'
+                  />
+                  <input
+                    type="text"
+                    placeholder="Digite o link do spotify da sua musica"
+                    value={newLink}
+                    onChange={(e) => setNewLink(e.target.value)}
+                    className="border p-3 rounded w-full text-neutral-200 mb-3"
+                    id='link-musica'
                   />
                   <button
                     onClick={handleAddSong}
@@ -101,7 +138,7 @@ const EditPlaylist = () => {
                 </div>
               </div>
               <form method="dialog" className="flex w-full justify-center">
-                <button className="bg-indigo-500 text-white px-36 py-2 rounded-2xl hover:bg-indigo-600" onClick={handleSubmit}>Confirmar</button>
+                <button className="bg-indigo-500 text-white p-3 w-full rounded hover:bg-indigo-600" onClick={handleSubmit}>Confirmar</button>
               </form>
             </div>
           )}
