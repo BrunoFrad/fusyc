@@ -6,12 +6,13 @@ const cors = require('cors')
 const connection = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'test',
+    password: '',
     database: 'fusyc'
 });
 
 let loginSuccessful = "false"
 let query
+
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -108,7 +109,7 @@ app.post('/api/editplaylist', (req, res) => {
 });
 
 app.post('/api/newplaylist', (req, res) => {
-    const { name, songsArr, genre } = req.body;
+    const { name, songsArr, genre, username } = req.body;
 
     if (!name || !Array.isArray(songsArr) || !Array.isArray(genre) || songsArr.length !== genre.length) {
         return res.status(400).json({ success: false, message: "Invalid input data" });
@@ -124,7 +125,7 @@ app.post('/api/newplaylist', (req, res) => {
         if (result.length > 0) {
             return res.json({ success: false });
         } else {
-            const createTableQuery = `CREATE TABLE ?? (NAME varchar(255), LINK varchar(255) , GENRE varchar(255))`;
+            const createTableQuery = `CREATE TABLE ?? (Id varchar(255), NAME varchar(255), LINK varchar(255) , GENRE varchar(255))`;
             connection.query(createTableQuery, [name], (err) => {
                 if (err) {
                     console.error("Database error:", err);
@@ -133,10 +134,10 @@ app.post('/api/newplaylist', (req, res) => {
 
                 console.log("Table created");
 
-                const insertQuery = "INSERT INTO ?? (NAME, GENRE) VALUES ?";
+                const insertQuery = "INSERT INTO ?? (ID ,NAME, GENRE) VALUES ?";
                 const values = songsArr.map((song, index) => [song, genre[index]]);
 
-                connection.query(insertQuery, [name, values], (err) => {
+                connection.query(insertQuery, [username ,name, values], (err) => {
                     if (err) {
                         console.error("Database error:", err);
                         return res.status(500).json({ success: false, message: "Internal server error" });
