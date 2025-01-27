@@ -51,6 +51,7 @@ const EditPlaylist = () => {
           name: playlists[selectedPlaylist].name,
           songlist: playlists[selectedPlaylist].songs,
           genre: playlists[selectedPlaylist].genre,
+          username : localStorage.getItem('username'),
         }),
       });
   

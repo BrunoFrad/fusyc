@@ -6,7 +6,7 @@ const cors = require('cors')
 const connection = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: 'test',
     database: 'fusyc'
 });
 
@@ -81,7 +81,7 @@ app.post('/api/register', (req, res) => {
 });
 
 app.post('/api/editplaylist', (req, res) => {
-    const { songlist, name, genre } = req.body;
+    const { songlist, name, genre, username } = req.body;
     let query = "SELECT * FROM ?? WHERE NAME = ?";
     for(index in songlist) {
         connection.query(query, [name, songlist[index]], (err, result) => {
@@ -91,8 +91,8 @@ app.post('/api/editplaylist', (req, res) => {
             }
 
             if (result && result.length === 0) {
-                query = 'INSERT INTO ?? (NAME, GENRE) VALUES (?, ?)';
-                connection.query(query, [name, songlist[index], genre[index]], (err) => {
+                query = `INSERT INTO ?? (NAME, GENRE, Id) VALUES (?, ?, ?)`;
+                connection.query(query, [name, songlist[index], genre[index], username], (err) => {
                     if (err) {
                         console.error('Error inserting song:', err);
                         return res.status(500).send('Error inserting song');
@@ -109,7 +109,7 @@ app.post('/api/editplaylist', (req, res) => {
 });
 
 app.post('/api/newplaylist', (req, res) => {
-    const { name, songsArr, genre, username } = req.body;
+    const { name, songsArr, genre, username, link } = req.body;
 
     if (!name || !Array.isArray(songsArr) || !Array.isArray(genre) || songsArr.length !== genre.length) {
         return res.status(400).json({ success: false, message: "Invalid input data" });
@@ -123,21 +123,21 @@ app.post('/api/newplaylist', (req, res) => {
         }
 
         if (result.length > 0) {
-            return res.json({ success: false });
+            return res.json({ success: false, message: "Table already exists" });
         } else {
-            const createTableQuery = `CREATE TABLE ?? (Id varchar(255), NAME varchar(255), LINK varchar(255) , GENRE varchar(255))`;
-            connection.query(createTableQuery, [name], (err) => {
+            const createTableQuery = `CREATE TABLE \`${name}\` (Id varchar(255), NAME varchar(255), LINK varchar(255), GENRE varchar(255))`;
+            connection.query(createTableQuery, (err) => {
                 if (err) {
                     console.error("Database error:", err);
                     return res.status(500).json({ success: false, message: "Internal server error" });
                 }
 
-                console.log("Table created");
+                console.log("Table created successfully");
 
-                const insertQuery = "INSERT INTO ?? (ID ,NAME, GENRE) VALUES ?";
-                const values = songsArr.map((song, index) => [song, genre[index]]);
+                const insertQuery = `INSERT INTO \`${name}\` (ID, NAME, GENRE, LINK) VALUES ?`;
+                const values = songsArr.map((song, index) => [username, song, genre[index], link]);
 
-                connection.query(insertQuery, [username ,name, values], (err) => {
+                connection.query(insertQuery, [values], (err) => {
                     if (err) {
                         console.error("Database error:", err);
                         return res.status(500).json({ success: false, message: "Internal server error" });
@@ -180,25 +180,31 @@ app.get('/api/playlists', (req, res) => {
                     
                     connection.query(`SELECT GENRE FROM ${table.TABLE_NAME}`, (err, result) => {
 
-                        if (err) {
-                            console.error("Database error:", err);
-                        }
+                        connection.query(`SELECT LINK FROM ${table.TABLE_NAME}`, (err, resu) => {
 
-                        let genreList = result ? result.map(row => row.GENRE) : [];
-                        console.log("Ok + ", genreList)
+                            if (err) {
+                                console.error("Database error:", err);
+                            }
+    
+                            let genreList = result ? result.map(row => row.GENRE) : [];
+                            let linkList = resu ? resu.map(row => row.LINK) : [];
+                            console.log("Ok + ", linkList)
+    
+                            responseContent.push({
+                                name: table.TABLE_NAME,
+                                songs: songList,
+                                genre : genreList,
+                                links : linkList,
+                            });
+    
+                            console.log(responseContent)
+    
+                            pendingQueries--;
+                            if (pendingQueries === 0) {
+                                res.json({ result: responseContent });
+                            }
 
-                        responseContent.push({
-                            name: table.TABLE_NAME,
-                            songs: songList,
-                            genre : genreList,
-                        });
-
-                        console.log(responseContent)
-
-                        pendingQueries--;
-                        if (pendingQueries === 0) {
-                            res.json({ result: responseContent });
-                        }
+                        })
 
                     })
                 });

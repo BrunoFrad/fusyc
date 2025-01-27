@@ -25,11 +25,12 @@ const CreatePlaylist = () => {
   };
 
   async function handleCreatePlaylist() {
+
     const response = await fetch('http://localhost:3000/api/newplaylist', {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: playlistName, songsArr: songs, genre: musicGenre}),
+      body: JSON.stringify({ name: playlistName, songsArr: songs, genre: musicGenre, username : localStorage.getItem('username'), links : newLink}),
       method: 'POST',
     })
 
@@ -37,6 +38,7 @@ const CreatePlaylist = () => {
     setSongs([]);
     setPlaylistName('');
     setGenre([]);
+    setNewLink('');
 
   }
 
