@@ -16,9 +16,11 @@ const EditPlaylist = () => {
           return { 
             ...playlist, 
             songs: [...playlist.songs, newSong], 
-            genre: [...playlist.genre, newGenre] 
+            genre: [...playlist.genre, newGenre],
+            link : [...playlist.link, newLink],
           };
         }
+        console.log(playlist)
         return playlist;
       });
       setPlaylists(updatedPlaylists);
@@ -26,10 +28,6 @@ const EditPlaylist = () => {
       setNewGenre('');
     }
   };  
-
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
 
   async function getPlaylistNames() {
     try {
@@ -52,6 +50,7 @@ const EditPlaylist = () => {
           songlist: playlists[selectedPlaylist].songs,
           genre: playlists[selectedPlaylist].genre,
           username : localStorage.getItem('username'),
+          link : playlists[selectedPlaylist].link,
         }),
       });
   
@@ -67,6 +66,9 @@ const EditPlaylist = () => {
     } catch (error) {
       console.error('Error:', error);
     }
+
+    location.reload();
+
   };
   
 

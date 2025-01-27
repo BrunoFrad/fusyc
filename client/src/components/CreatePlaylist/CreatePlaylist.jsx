@@ -6,6 +6,7 @@ const CreatePlaylist = () => {
   const [newSong, setNewSong] = useState('');
   const [newGenre, setNewGenre] = useState('');
   const [newLink, setNewLink] = useState('');
+  const [links, setLinks] = useState([]);
 
   const handleAddSong = () => {
     if (newSong.trim() !== '') {
@@ -18,10 +19,11 @@ const CreatePlaylist = () => {
       setNewGenre('');
     }
 
-  };
+    if (newSong.trim() !== '') {
+      setLinks([...links, newLink]);
+      setNewLink('');
+    }
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
   };
 
   async function handleCreatePlaylist() {
@@ -30,7 +32,7 @@ const CreatePlaylist = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: playlistName, songsArr: songs, genre: musicGenre, username : localStorage.getItem('username'), links : newLink}),
+      body: JSON.stringify({ name: playlistName, songsArr: songs, genre: musicGenre, username : localStorage.getItem('username'), link : links}),
       method: 'POST',
     })
 
@@ -39,6 +41,8 @@ const CreatePlaylist = () => {
     setPlaylistName('');
     setGenre([]);
     setNewLink('');
+
+    location.reload();
 
   }
 

@@ -81,7 +81,7 @@ app.post('/api/register', (req, res) => {
 });
 
 app.post('/api/editplaylist', (req, res) => {
-    const { songlist, name, genre, username } = req.body;
+    const { songlist, name, genre, username, link } = req.body;
     let query = "SELECT * FROM ?? WHERE NAME = ?";
     for(index in songlist) {
         connection.query(query, [name, songlist[index]], (err, result) => {
@@ -134,21 +134,17 @@ app.post('/api/newplaylist', (req, res) => {
 
                 console.log("Table created successfully");
 
-                const insertQuery = `INSERT INTO \`${name}\` (ID, NAME, GENRE, LINK) VALUES ?`;
-                const values = songsArr.map((song, index) => [username, song, genre[index], link]);
-
-                connection.query(insertQuery, [values], (err) => {
+                for(index in songsArr) {
+                    connection.query(`INSERT INTO ?? (NAME, GENRE, Id, LINK) VALUES (?, ?, ?, ?)`, [name, songsArr[index], genre[index], username, link[index]])
+                }
                     if (err) {
                         console.error("Database error:", err);
                         return res.status(500).json({ success: false, message: "Internal server error" });
                     }
 
-                    console.log("Songs inserted successfully");
-                    res.json({ success: true });
-                });
-            });
-        }
-    });
+                })
+            }
+        });
 });
 
 app.get('/api/playlists', (req, res) => {
@@ -194,7 +190,7 @@ app.get('/api/playlists', (req, res) => {
                                 name: table.TABLE_NAME,
                                 songs: songList,
                                 genre : genreList,
-                                links : linkList,
+                                link : linkList,
                             });
     
                             console.log(responseContent)
