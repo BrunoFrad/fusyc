@@ -28,6 +28,7 @@ export default function Navbar() {
             case "Player":
                 setNavbar({Home : false, Player:true, Account: false})
                 sessionStorage.setItem('navbarStatus', JSON.stringify({Home : false, Player:true, Account: false}))
+                window.location.replace("http://localhost:5173/player.html")
                 break;
             case "Account":
                 setNavbar({Home : false, Player:false, Account: true})

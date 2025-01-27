@@ -16,7 +16,9 @@ export default function LoginForm() {
             
             if(data.success === 'true') {
                 localStorage.setItem('login', 'true')
+                localStorage.setItem('username', usernameRef.current.value)
                 window.location.replace('http://localhost:5173/index.html')
+            
             } else {
                 localStorage.setItem('login', 'false')
                 window.location.replace('http://localhost:5173/login.html')
