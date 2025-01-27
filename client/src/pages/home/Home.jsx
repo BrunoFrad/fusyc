@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import Navbar from "../../components/Navbar/Navbar"
 import FeatureBox from "../../components/FeatureBox/FeatureBox"
 import CreatePlaylist from '../../components/CreatePlaylist/CreatePlaylist'
