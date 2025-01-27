@@ -28,7 +28,25 @@ const EditPlaylist = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  } 
+  }
+
+  async function handleSubmit() {
+
+    window.alert("ok")
+
+    try {
+      const response = fetch('http://localhost:3000/api/editplaylist', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method : "POST",
+        body: JSON.stringify({name : playlists[selectedPlaylist].name, songlist : playlists[selectedPlaylist].songs}),
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+
+  }
 
   useEffect(() => {
 
@@ -83,7 +101,7 @@ const EditPlaylist = () => {
                 </div>
               </div>
               <form method="dialog" className="flex w-full justify-center">
-                <button className="bg-indigo-500 text-white px-36 py-2 rounded-2xl hover:bg-indigo-600">Confirmar</button>
+                <button className="bg-indigo-500 text-white px-36 py-2 rounded-2xl hover:bg-indigo-600" onClick={handleSubmit}>Confirmar</button>
               </form>
             </div>
           )}

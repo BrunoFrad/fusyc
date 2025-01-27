@@ -81,18 +81,33 @@ app.post('/api/register', (req, res) => {
 
 app.post('/api/editplaylist', (req, res) => {
     const { songlist, name } = req.body;
-    query = "SELECT * FROM ? WHERE NAME = ?";
+
+    if (!songlist || !Array.isArray(songlist) || songlist.length === 0 || !name) {
+        return res.status(400).json({ success: false, message: "Invalid input data" });
+    }
+
     songlist.forEach(song => {
-        connection.query(query, [name, song], (err, result) => {
-            if (result.length = 0) {
-                query = 'INSERT INTO ? (NAME) VALUES (?)'
-                connection.query(query, [name, song])
+        let selectQuery = `SELECT * FROM ${mysql.escapeId(name)} WHERE NAME = ?`;
+        connection.query(selectQuery, [song], (err, result) => {
+            if (err) {
+                console.error("Database error:", err);
+                return res.status(500).json({ success: false, message: "Internal server error" });
             }
-        })
 
-
+            if (result.length === 0) {
+                let insertQuery = `INSERT INTO ${mysql.escapeId(name)} (NAME) VALUES (?)`;
+                connection.query(insertQuery, [song], (err) => {
+                    if (err) {
+                        console.error("Database error:", err);
+                    }
+                });
+            }
+        });
     });
-})
+
+    res.json({ success: true });
+});
+
 
 app.post('/api/newplaylist', (req, res) => {
 

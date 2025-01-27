@@ -23,16 +23,6 @@ const CreatePlaylist = () => {
       method: 'POST',
     })
 
-    if (playlistName.trim() === '') {
-      alert('Por favor, insira um nome para a playlist.');
-      return;
-    }
-
-    if (!selectedFile) {
-      alert('Por favor, insira um arquivo de música.');
-      return;
-    }
-
     document.getElementById('nome-musica').value = ''
     setSongs([])
     setPlaylistName('')
