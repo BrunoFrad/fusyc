@@ -91,8 +91,8 @@ app.post('/api/editplaylist', (req, res) => {
             }
 
             if (result && result.length === 0) {
-                query = `INSERT INTO ?? (NAME, GENRE, Id) VALUES (?, ?, ?)`;
-                connection.query(query, [name, songlist[index], genre[index], username], (err) => {
+                query = `INSERT INTO ?? (NAME, GENRE, Id) VALUES (?, ?, ?, ?)`;
+                connection.query(query, [name, songlist[index], genre[index], username, link[index]], (err) => {
                     if (err) {
                         console.error('Error inserting song:', err);
                         return res.status(500).send('Error inserting song');

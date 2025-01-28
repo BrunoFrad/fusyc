@@ -53,6 +53,8 @@ const EditPlaylist = () => {
           link : playlists[selectedPlaylist].link,
         }),
       });
+
+      console.log(playlists[selectedPlaylist].link)
   
       const data = await response.json();
       console.log(data);
