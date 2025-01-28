@@ -8,6 +8,7 @@ export default function Player() {
     const [selectedPlaylist, setSelectedPlaylist] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSong, setSelectedSong] = useState(null);
+    let dict = {}
 
     async function getPlaylistNames() {
         try {
@@ -18,6 +19,12 @@ export default function Player() {
         } catch (error) {
           console.error('Error fetching data:', error);
         }
+    }
+
+    function getOccurrence(array, value) {
+        var count = 0;
+        array.forEach((v) => (v === value && count++));
+        return count;
     }
 
     useEffect(() => {
@@ -43,9 +50,13 @@ export default function Player() {
                             onChange={(e) => setSelectedPlaylist(parseInt(e.target.value))}
                             >
                             <option value="" disabled selected>Escolha uma playlist</option>
-                            {playlists.map((playlist, index) => (
-                                <option key={index} value={index}>{playlist.name}</option>
-                            ))}
+                            {playlists.map((playlist, index) => {
+                                if(playlist.id != undefined && playlist.id.Id != null) {
+                                    return(
+                                        <option key={index} value={index}>{playlist.name}</option>
+                                    )
+                                }
+                            })}
                             </select>
                             {selectedPlaylist !== null && selectedPlaylist !== "" && (
                                 <select
@@ -58,10 +69,13 @@ export default function Player() {
                                     {playlists.map((playlist, index) => (
                                         playlist.genre
                                         .map((categ, index) => {
-                                        
+                                            
                                             console.log(selectedPlaylist)
-        
-                                            if(categ != null) {
+                                            
+                                            dict[categ] += 1
+                                            console.log(dict)
+
+                                            if(categ != null && dict[categ] <= 2) {
                                                 return(
                                                     <option key={index} value={index}>
                                                         {categ}

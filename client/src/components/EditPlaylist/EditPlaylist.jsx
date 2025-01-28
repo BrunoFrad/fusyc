@@ -20,7 +20,6 @@ const EditPlaylist = () => {
             link : [...playlist.link, newLink],
           };
         }
-        console.log(playlist)
         return playlist;
       });
       setPlaylists(updatedPlaylists);
@@ -38,6 +37,7 @@ const EditPlaylist = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
+
   }
 
   const handleSubmit = async () => {
@@ -53,8 +53,6 @@ const EditPlaylist = () => {
           link : playlists[selectedPlaylist].link,
         }),
       });
-
-      console.log(playlists[selectedPlaylist].link)
   
       const data = await response.json();
       console.log(data);

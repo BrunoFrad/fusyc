@@ -186,20 +186,24 @@ app.get('/api/playlists', (req, res) => {
                             let linkList = resu ? resu.map(row => row.LINK) : [];
                             console.log("Ok + ", linkList)
     
-                            responseContent.push({
-                                name: table.TABLE_NAME,
-                                songs: songList,
-                                genre : genreList,
-                                link : linkList,
-                            });
-    
-                            console.log(responseContent)
-    
-                            pendingQueries--;
-                            if (pendingQueries === 0) {
-                                res.json({ result: responseContent });
-                            }
+                            connection.query(`SELECT Id FROM ${table.TABLE_NAME}`, (err, re) => {
 
+                                responseContent.push({
+                                    name: table.TABLE_NAME,
+                                    songs: songList,
+                                    genre : genreList,
+                                    link : linkList,
+                                    id : re[0],
+                                });
+
+                                console.log(responseContent)
+
+                                pendingQueries--;
+                                if (pendingQueries === 0) {
+                                    res.json({ result: responseContent });
+                                }
+
+                            })
                         })
 
                     })
